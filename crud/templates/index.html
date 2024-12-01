@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Index</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            background: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #555;
+            margin-bottom: 20px;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 15px;
+        }
+
+        label {
+            margin-bottom: 5px;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        input[type="text"] {
+            padding: 8px;
+            font-size: 14px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+
+        input[type="submit"] {
+            padding: 10px;
+            font-size: 14px;
+            color: #fff;
+            background-color: #007BFF;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #0056b3;
+        }
+
+        .divider {
+            margin: 20px 0;
+            border-top: 1px solid #ddd;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Flask CRUD Operation</h1>
+
+        <form action="/post">
+            <input type="submit" value="Add New Data">
+        </form>
+
+        <div class="divider"></div>
+
+        <form action="/get">
+            <label for="fname">Name:</label>
+            <input type="text" name="fname" id="fname" placeholder="Enter name">
+            <input type="submit" value="Get">
+        </form>
+
+        <div class="divider"></div>
+
+        <form action="/update">
+            <label for="uname">Name:</label>
+            <input type="text" name="uname" id="uname" placeholder="Enter name">
+            <input type="submit" value="Update">
+        </form>
+
+        <div class="divider"></div>
+
+        <form action="/delete">
+            <label for="dname">Name:</label>
+            <input type="text" name="dname" id="dname" placeholder="Enter name">
+            <input type="submit" value="Delete">
+        </form>
+    </div>
+</body>
+</html>
