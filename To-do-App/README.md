@@ -10,8 +10,6 @@ A simple and interactive **To-Do List Application** built using Flask to manage 
 - **Delete Tasks**: Remove tasks when they're no longer needed.
 - **Mark Done**: Mark tasks as completed to track progress.
 
-## File Structure
-
 ## Getting Started
 
 Follow these instructions to set up and run the application on your local machine.
@@ -39,7 +37,7 @@ Follow these instructions to set up and run the application on your local machin
     ```bash
     python main.py
 
-### File Structure
+## File Structure
   ```bash
     todo-app/
     ├── main.py              # Main Flask application logic
