@@ -1,77 +1,176 @@
 {% extends "layout.html" %}
 
-{% block title %}Expense Tracker{% endblock %}
+{% block title %}
+    Expense Tracker
+{% endblock %}
 
 {% block style %}
 <style>
     /* General Styling */
     body {
-        font-family: 'Arial', sans-serif;
-        background-color: #f4f6f9;
+        font-family: 'Inter', sans-serif;
+        background-color: #f9f9f9;
         color: #333;
+        margin: 0;
+        padding: 0;
     }
 
     .container {
-        max-width: 1200px; /* Changed from 900px to 1100px */
-        margin: 2rem auto;
+        max-width: 900px;
+        margin: 5rem auto;
         background-color: #ffffff;
         border-radius: 10px;
         box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-        padding: 2.5rem; /* Increased padding for more breathing room */
-        overflow-x: auto;
+        padding: 1.5rem;
+        overflow-x: auto; /* Handles overflow on smaller screens */
     }
 
     h1 {
+    text-align: center;
+    margin-bottom: 2rem;
+    color: #444;
+    font-size: 2.5rem; /* Adjust this value as needed */
+}
+
+
+    h1.navbar-text
+        {
         text-align: center;
         margin-bottom: 2rem;
-        color: #444;
+        color: #fff;
     }
 
-    .logout-btn {
-        background-color: #dc3545;
+    
+
+    /* Navbar Styling */
+    .navbar {
+        background-color: #333;
         color: #fff;
-        border: none;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
         padding: 10px 20px;
-        font-size: 1rem;
+        position: fixed;
+        width: 100%;
+        top: 0;
+        left: 0;
+        z-index: 1000;
+        box-sizing: border-box;
+    }
+
+    .navbar h1 {
+        font-size: 1.5rem;
+        margin: 0;
+    }
+
+    .navbar-buttons {
+        display: flex;
+        gap: 15px;
+    }
+
+    .navbar-button {
+        background-color: #5bc0de;
+        color: #fff;
+        padding: 8px 15px;
+        border: none;
         border-radius: 5px;
         cursor: pointer;
         transition: background-color 0.3s;
-        display: block;
-        margin-left: auto;
-        margin-bottom: 20px;
+        text-decoration: none;
     }
 
-    .logout-btn:hover {
-        background-color: #c82333;
+    .navbar-button:hover {
+        background-color: #31b0d5;
     }
+
+    .logout-button {
+        background-color: #d9534f;
+    }
+
+    .logout-button:hover {
+        background-color: #c9302c;
+    }
+
+    /* Content Section */
+    .content {
+        margin-top: 10px; /* Push content below navbar */
+    }
+
+    /* Flash Message Styling */
+    .flash {
+        padding: 15px;
+        margin-bottom: 20px;
+        border-radius: 5px;
+        font-size: 1rem;
+        transition: all 0.3s ease-in-out;
+    }
+
+    .flash-success {
+        background-color: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+    }
+
+    .flash-error {
+        background-color: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+    }
+
+    .flash-warning {
+        background-color: #fff3cd;
+        color: #856404;
+        border: 1px solid #ffeeba;
+    }
+
+    .flash-info {
+        background-color: #d1ecf1;
+        color: #0c5460;
+        border: 1px solid #bee5eb;
+    }
+
+    .flash p {
+        margin: 0;
+        padding: 0;
+    }
+
 
     /* Form Styling */
-    .expense-form {
-        display: flex;
+    form {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr) auto; /* Adjust column layout */
         gap: 15px;
         margin-bottom: 2rem;
     }
 
-    .expense-form input[type="text"],
-    .expense-form input[type="number"],
-    .expense-form input[type="date"],
-    .expense-form select,
-    .expense-form button {
+    form input[type="text"],
+    form input[type="date"],
+    form select,
+    form input[type="submit"] {
         padding: 10px;
         font-size: 1rem;
         border: 1px solid #ddd;
         border-radius: 5px;
+    }
+
+    form input[type="text"],
+    form input[type="date"] {
+        width: 90%;
+    }
+
+    form select {
         width: 100%;
     }
 
-    .expense-form button {
+    form input[type="submit"] {
         background-color: #28a745;
         color: #fff;
         border: none;
         cursor: pointer;
+        transition: background-color 0.3s;
     }
 
-    .expense-form button:hover {
+    form input[type="submit"]:hover {
         background-color: #218838;
     }
 
@@ -79,271 +178,197 @@
     table {
         width: 100%;
         border-collapse: collapse;
+        margin-bottom: 1rem;
+        table-layout: fixed; /* Ensures proper column widths */
     }
 
-    table th, table td {
+    table th,
+    table td {
         text-align: left;
-        padding: 15px;
+        padding: 10px;
         border: 1px solid #ddd;
+        word-wrap: break-word; /* Handles long text */
     }
 
     table th {
         background-color: #f8f9fa;
+        color: #333;
     }
 
-    table tr:nth-child(even) {
-        background-color: #f2f2f2;
+    table td {
+        background-color: #fff;
     }
 
-    table tr:hover {
-        background-color: #e9ecef;
-    }
-
-    /* General Button Styles */
-    button, .btn-edit, .btn-save, .btn-delete, .logout-btn {
-        font-family: 'Arial', sans-serif;
-        font-size: 1rem;
-        padding: 12px 24px;
-        border-radius: 8px;
+    /* Buttons inside Table */
+    .btn {
+        padding: 5px 10px;
+        font-size: 0.9rem;
         border: none;
+        border-radius: 5px;
         cursor: pointer;
-        transition: all 0.3s ease-in-out;
-        text-align: center;
-        font-weight: bold;
+        transition: background-color 0.3s;
     }
 
-    /* Logout Button */
-    .logout-btn {
-        background-color: #dc3545;
-        color: white;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    }
-
-    .logout-btn:hover {
-        background-color: #c82333;
-        transform: translateY(-3px);
-    }
-
-    .logout-btn:active {
-        background-color: #bd2130;
-        transform: translateY(0);
-    }
-
-    /* Edit Button */
     .btn-edit {
-        background-color: #007bff;
-        color: white;
-        padding: 10px 20px;
-        border-radius: 6px;
+        background-color: #ffc107;
+        text-decoration: none;
+        color: #fff;
     }
 
     .btn-edit:hover {
-        background-color: #0056b3;
-        transform: translateY(-3px);
+        background-color: #e0a800;
     }
 
-    .btn-edit:active {
-        background-color: #004085;
-        transform: translateY(0);
-    }
-
-    /* Save Button */
-    .btn-save {
-        background-color: #28a745;
-        color: white;
-        padding: 10px 20px;
-        border-radius: 6px;
-        display: none;
-    }
-
-    .btn-save:hover {
-        background-color: #218838;
-        transform: translateY(-3px);
-    }
-
-    .btn-save:active {
-        background-color: #1e7e34;
-        transform: translateY(0);
-    }
-
-    /* Delete Button */
     .btn-delete {
         background-color: #dc3545;
-        color: white;
-        padding: 10px 20px;
-        border-radius: 6px;
-        text-decoration: none; /* This removes the underline */
-
+        text-decoration: none;
+        color: #fff;
     }
 
     .btn-delete:hover {
         background-color: #c82333;
-        transform: translateY(-3px);
+        text-decoration: none;
     }
 
-    .btn-delete:active {
-        background-color: #bd2130;
-        transform: translateY(0);
-    }
-
-    /* Button Reset */
-    button:focus, .btn-edit:focus, .btn-save:focus, .btn-delete:focus, .logout-btn:focus {
-        outline: none;
-        box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
-    }
-
-    /* Action Buttons */
-    .action-buttons {
-        display: flex;
-        gap: 10px; /* Space between the buttons */
-        justify-content: center; /* Center the buttons within the table cell */
-    }
-
-    .action-buttons button, .action-buttons a {
-        font-family: 'Arial', sans-serif;
-        font-size: 1rem;
-        padding: 8px 15px;
-        border-radius: 6px;
-        cursor: pointer;
-        text-align: center;
-        transition: all 0.3s ease-in-out;
-        font-weight: bold;
-    }
-
-    .action-buttons .btn-edit {
-        background-color: #007bff;
-        color: white;
-    }
-
-    .action-buttons .btn-edit:hover {
-        background-color: #0056b3;
-        transform: translateY(-3px);
-    }
-
-    .action-buttons .btn-edit:active {
-        background-color: #004085;
-        transform: translateY(0);
-    }
-
-    .action-buttons .btn-delete {
-        background-color: #dc3545;
-        color: white;
-    }
-
-    .action-buttons .btn-delete:hover {
-        background-color: #c82333;
-        transform: translateY(-3px);
-    }
-
-    .action-buttons .btn-delete:active {
-        background-color: #bd2130;
-        transform: translateY(0);
-    }
-
+    /* Filter Section */
     .filter-section {
         display: flex;
         justify-content: space-between;
+        align-items: center;
+        margin-top: 1rem;
+        gap: 10px;
     }
 
+    .filter-section label {
+        margin-right: 10px;
+        font-weight: bold;
+    }
+
+    .filter-section select {
+        padding: 8px;
+        border-radius: 5px;
+        border: 1px solid #ddd;
+        width: auto;
+    }
+
+    .total {
+        font-weight: bold;
+        font-size: 1.2rem;
+    }
+
+    /* Responsive Design */
     @media (max-width: 768px) {
-        .expense-form {
-            flex-direction: column;
+        form {
+            grid-template-columns: 1fr; /* Stack form elements vertically */
         }
 
-        .container {
-            max-width: 100%; /* Use the full width of the screen on smaller devices */
+        form input[type="submit"] {
+            width: 100%; /* Full width submit button */
+        }
+
+        .filter-section {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .filter-section select {
+            margin-top: 10px;
+        }
+
+        .navbar {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .navbar-buttons {
+            flex-direction: column;
+            align-items: flex-start;
+            width: 100%;
+        }
+
+        .navbar-button {
+            width: 100%;
+            text-align: center;
         }
     }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="container">
-    <form action="{{ url_for('logout') }}" method="POST">
-        <button type="submit" class="logout-btn">Logout</button>
-    </form>
-
-    <h1>Expense Tracker</h1>
-
-    <!-- Add Expense Form -->
-    <form class="expense-form" method="POST" action="/add">
-        {{ form.hidden_tag() }}
-        {{ form.expense(placeholder="Expense Name") }}
-        {{ form.amount(placeholder="Amount") }}
-        {{ form.description(placeholder="Description") }}
-        {{ form.category() }}
-        {{ form.date() }}
-        {{ form.submit(class="btn btn-primary") }}
-    </form>
-
-    <table>
-        <thead>
-            <tr>
-                <th>Expense Name</th>
-                <th>Amount</th>
-                <th>Category</th>
-                <th>Date</th>
-                <th>Description</th>
-                <th>Action</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for ex in data %}
-            <tr>
-                <form method="POST" action="{{url_for('edit', id=ex.id)}}">
-                    <td><input type="text" name="expense" value="{{ ex.expense }}" disabled></td>
-                    <td><input type="number" name="amount" value="{{ ex.amount }}" disabled></td>
-                    <td><input type="" name="category" value="{{ ex.category }}" disabled></td>
-                    <td><input type="date" name="date" value="{{ ex.date }}" disabled></td>
-                    <td><input type="text" name="description" value="{{ ex.description }}" disabled></td>
-                    <td>
-                        <div class="action-buttons">
-                            <button type="button" class="btn-edit" onclick="makeEditable(this)">Edit</button>
-                            
-                            <button type="submit" class="btn-save" style="display: none;">Save</button>
-                            <a href="{{ url_for('delete', id=ex.id) }}" class="btn-delete">Delete</a>
-                        </div>
-                    </td>
-                </form>
-                
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-
-    <div class="filter-section">
-        <p><strong>Total Amount: ₹{{ "%.2f"|format(tota) }}</strong></p>
-        <label for="filter-category">Filter by Category:</label>
-        <select id="filter-category">
-            <option value="all">All</option>
-            {% for category in categories %}
-            <option value="{{ category }}">{{ category }}</option>
-            {% endfor %}
-        </select>
+    <!-- Navbar -->
+    <div class="navbar">
+        <h1 class="navbar-text">Expense Tracker</h1>
+        <div class="navbar-buttons">
+            <a href="/dashboard" class="navbar-button">Dashboard</a>
+            <a href="/logout" class="navbar-button logout-button">Logout</a>
+        </div>
     </div>
-</div>
 
-<script>
-    function makeEditable(button) {
-        const row = button.closest('tr');
-        const inputs = row.querySelectorAll('input');
-        const editButton = row.querySelector('.btn-edit');
-        const saveButton = row.querySelector('.btn-save');
+    <!-- Content Section -->
+    <div class="container">
+        <div class="content">
+            <h1>Expense Tracker</h1>
 
-        const initialValues = {};
-        inputs.forEach(input => {
-            initialValues[input.name] = input.value;
-        });
-        row.dataset.changed = 'false';
+            {% with messages = get_flashed_messages(with_categories=True) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="flash flash-{{ category }}">
+                            <p>{{ message }}</p>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
 
-        inputs.forEach(input => {
-        if (input.name !== 'expense') {
-            input.disabled = !input.disabled;
-        }
-    });        editButton.style.display = 'none';
-        saveButton.style.display = 'inline-block';
+            <!-- Add Expense Form -->
+            <form method="POST" action="/add">
+                {{ form.hidden_tag() }}
+                {{ form.expense(class="form-control", placeholder="Expense Name") }}
+                {{ form.amount(class="form-control", placeholder="Amount") }}
+                {{ form.description(class="form-control", placeholder="Description") }}
+                {{ form.category(class="form-control") }}
+                {{ form.date(class="form-control") }}
+                {{ form.submit(class="btn btn-primary") }}
+            </form>
 
-        
-    }
-</script>
+            <!-- Expense Table -->
+            <table>
+                <thead>
+                    <tr>
+                        <th>Expense Name</th>
+                        <th>Amount</th>
+                        <th>Category</th>
+                        <th>Date</th>
+                        <th>Description</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for ex in data[::-1] %}
+                        <tr>
+                            <td>{{ ex.expense }}</td>
+                            <td>
+                                {% if ex.expense == "Expense" %}
+                                    <span style="color: red;">- ₹{{ "%.2f"|format(ex.amount) }}</span>
+                                {% elif ex.expense == "Income" %}
+                                    <span style="color: green;">+ ₹{{ "%.2f"|format(ex.amount) }}</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ ex.category }}</td>
+                            <td>{{ ex.date }}</td>
+                            <td>{{ ex.description }}</td>
+                            <td>
+                                <a href="/edit/{{ex.id}}" class="btn btn-edit">Edit</a>
+                                <a href="/delete/{{ex.id}}" class="btn btn-delete">Delete</a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            <!-- Total Section -->
+            <div class="filter-section">
+                <p class="total"><strong>Total Amount: ₹{{ "%.2f"|format(total) }}</strong></p>
+            </div>
+        </div>
+    </div>
 {% endblock %}
