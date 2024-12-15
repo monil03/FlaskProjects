@@ -1,8 +1,6 @@
 import table 
-from table import users, files
-from table import db
-from table import app
-from flask import Flask,request,url_for,render_template,flash,redirect
+from table import db,app
+from flask import Flask,request,url_for,render_template,flash,redirect,flash
 from flask_login import LoginManager,login_user,logout_user,UserMixin,current_user,login_required
 from flask_wtf import FlaskForm
 from wtforms.validators import DataRequired
@@ -10,16 +8,14 @@ from wtforms import SubmitField,FileField
 from flask_wtf.file import FileAllowed, FileRequired
 import boto3
 from botocore.exceptions import ClientError, NoCredentialsError, PartialCredentialsError
-from datetime import datetime
+from datetime import datetime,timedelta
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.utils import secure_filename
-from datetime import timedelta
 
 
-
-s3 = boto3.client('s3',aws_access_key_id='Your-key',
-    aws_secret_access_key='Your-key',
-    region_name='-'
+s3 = boto3.client('s3',aws_access_key_id='your-key',
+    aws_secret_access_key='your-key',
+    region_name='ap-south-1'
 )
 app.config['SECRET_KEY']="abc"
 login_manager=LoginManager()
@@ -38,10 +34,10 @@ def signup():
         username=request.form.get('username')
         password=request.form.get('password')
         emailid=request.form.get('emailid')
-        new_user=users(username=username,email=emailid,password=password)
+        new_user=table.users(username=username,email=emailid,password=password)
         db.session.add(new_user)
         db.session.commit()  
-        abc = users.query.all()
+        abc = table.users.query.all()
         for i in abc:
             print(i.username)
         return render_template('login.html') 
@@ -52,7 +48,7 @@ def login():
     if request.method=='POST':
         username=request.form.get('name')
         password=request.form.get('password')
-        abc=users.query.filter_by(email=username).first()
+        abc=table.users.query.filter_by(email=username).first()
         print(abc)
         if abc and abc.password==password:
             login_user(abc)
@@ -64,32 +60,70 @@ def login():
 
 
 @app.route('/filesharing',methods=['post','get'])
+@login_required
 def filesharing():
     form=UploadForm()
-    file_table = files.query.filter_by(user_id=current_user.id)
+    
 
     if request.method=="POST":
         file = form.file.data  # Get the file from the request
         filename = secure_filename(file.filename)
-        expirationdate = datetime.today() + timedelta(days=1)
-        s3.upload_fileobj(file, 'bucket-name', filename)
+
+        s3.upload_fileobj(file, 'aer0p1an3', filename)
         url = s3.generate_presigned_url('get_object',
-                                                    Params={'Bucket': 'bucket-name',
+                                                    Params={'Bucket': 'aer0p1an3',
                                                             'Key': filename},
-                                                    ExpiresIn=100)
-        
-        file_up=files(file_name=file.filename,expiration_date=expirationdate,created_at=datetime.now(),shared_link=url,user_id=current_user.id)
-        
-        db.session.add(file_up)
+                                                    ExpiresIn=60)
+
+        abc=table.files(file_name=file.filename,shared_link=url,user_id=current_user.id)
+        file_table = table.files.query.filter_by(user_id=current_user.id)
+
+        db.session.add(abc)
         db.session.commit()
-        return redirect(url_for('filesharing'))
 
-    return render_template('filesharing.html',form=form, ft = file_table)
 
+
+
+        for i in file_table:
+            print(i.file_name)
+
+        
+        return render_template('filesharing.html',form=form)
+
+
+
+    return render_template('filesharing.html',form=form)
+
+@app.route('/show_data')
+@login_required
+def show_data():
+    
+    form=UploadForm()
+    data=table.files.query.filter_by(user_id=current_user.id).all()
+    current_time=datetime.now()
+    print(current_time)
+
+    return render_template('filesharing.html',data=data,form=form,current_time=current_time)
+
+@app.route("/logout")
+def logout():
+    logout_user()
+    return redirect(url_for('login'))
 @login_manager.user_loader
 def loader_user(user_id):
     return table.users.query.get(user_id)
 
+@app.route('/delete/<int:id>')
+def delete(id):
+    abc=table.files.query.get(id)
+    s3.delete_object(Bucket='aer0p1an3',Key= abc.file_name)
+
+    db.session.delete(abc)
+    db.session.commit()
+    flash("Deleted Successfully")
+    return redirect(url_for('filesharing'))
+
+    
 with app.app_context():
     db.create_all()
 
