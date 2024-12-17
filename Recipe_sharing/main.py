@@ -8,7 +8,7 @@ from wtforms.validators import DataRequired
 from flask_wtf.file import FileRequired,FileAllowed
 
 
-app.config['SECRET_KEY']="abc"
+app.config['SECRET_KEY']="your-secret-key"
 login_manager=LoginManager()
 login_manager.login_view='login' # If user is not authenticated, they will be redirected here
 login_manager.init_app(app) # Connects Flask-Login to your Flask app
