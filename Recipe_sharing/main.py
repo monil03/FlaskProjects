@@ -1,5 +1,5 @@
 import table 
-from table import db,app,post_receipe,users
+from table import db,app,post_receipe,users, comments
 from flask import Flask,request,url_for,render_template,flash,redirect,flash,send_file
 from flask_login import LoginManager,login_user,logout_user,UserMixin,current_user,login_required
 from flask_wtf import FlaskForm
@@ -7,6 +7,7 @@ from wtforms import StringField,SubmitField,FileField,IntegerField
 from wtforms.validators import DataRequired
 from flask_wtf.file import FileRequired,FileAllowed
 import io 
+
 app.config['SECRET_KEY']="abc"
 login_manager=LoginManager()
 login_manager.login_view='login' # If user is not authenticated, they will be redirected here
@@ -83,33 +84,44 @@ def imageProcess(id):
 def loader_user(user_id):
     return users.query.get(user_id)
 
-
-
 @app.route('/get_receipe/<int:id>')
 def getReceipe(id):
+    all_comments = comments.query.filter_by(post_id=id).all()
     getData=post_receipe.query.get(id)
-    return render_template('getData.html',data=getData)
+    post_likes = post_receipe.query.get(id)
+    return render_template('getData.html',data=getData, all_comments = all_comments,likes=post_likes.likes)
 
-
-
-@app.route('/add_comment/<int:id>',methods=["POST","GET"])
-@login_required
-def add_comment(id):
-    abc = post_receipe.query.get(id)     
-    name=current_user.username
+@app.route('/add_comment/<int:id>',methods=['POST','GET'])
+def addComment(id):
 
     if request.method=="POST":
-        comment=request.form.get('comment')
-        abc.comment += comment + '\n'  # Include username to track who commented
+        user_comment = request.form.get('comment')
+        new_comment = comments(user_id = current_user.id, post_id = id, comment = user_comment, user_name = current_user.username)
+        db.session.add(new_comment)
         db.session.commit()
-        return redirect(url_for('add_comment',id=id))
-    return render_template('getData.html',data=abc,name=name)
+        return redirect(url_for('getReceipe',id=id))
+    return redirect(url_for('getReceipe',id=id))
 
+@app.route("/logout")
+def logout():
+    logout_user()
+    return redirect(url_for('login'))
 
-
-
+@app.route('/like/<int:id>', methods=['POST','GET'])
+@login_required
+def likePost(id):
+    post_likes = post_receipe.query.get(id)
+    post_likes_user=users.query.get(current_user.id)
+    if post_likes_user.likes == 0 and post_likes.likes >= 0:
+        post_likes_user.likes = 1
+        post_likes.likes += 1
+    elif post_likes_user.likes==1:
+        pass
+    db.session.commit()
+    return redirect(url_for('getReceipe',id=id))
+    
 
 with app.app_context():
     db.create_all()
 
-app.run()
+app.run(debug=True)
