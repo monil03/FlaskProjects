@@ -1,5 +1,5 @@
 import table 
-from table import db,app,post_receipe,users, comments
+from table import db,app,post_receipe,users,comments,likes
 from flask import Flask,request,url_for,render_template,flash,redirect,flash,send_file
 from flask_login import LoginManager,login_user,logout_user,UserMixin,current_user,login_required
 from flask_wtf import FlaskForm
@@ -110,14 +110,29 @@ def logout():
 @app.route('/like/<int:id>', methods=['POST','GET'])
 @login_required
 def likePost(id):
-    post_likes = post_receipe.query.get(id)
-    post_likes_user=users.query.get(current_user.id)
-    if post_likes_user.likes == 0 and post_likes.likes >= 0:
-        post_likes_user.likes = 1
-        post_likes.likes += 1
-    elif post_likes_user.likes==1:
-        pass
-    db.session.commit()
+    flag=0
+    post_likes = likes.query.filter_by(post_receipe_id=id)
+    main_post=post_receipe.query.get(id)
+
+
+    if post_likes is None:
+        add_likes=likes(user_id=current_user.id,post_receipe_id=id,like=1)
+        db.session.add(add_likes)
+        main_post.likes+=1
+        db.session.commit()
+    else:
+        for li in post_likes:
+            if li.user_id==current_user.id:
+                flag=1
+        if flag==0:
+            add_likes=likes(user_id=current_user.id,post_receipe_id=id,like=1)
+            db.session.add(add_likes)
+            main_post.likes+=1
+            db.session.commit()
+            
+
+
+    
     return redirect(url_for('getReceipe',id=id))
     
 
