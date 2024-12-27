@@ -22,17 +22,24 @@ class addPosts(FlaskForm):
 
 @app.route('/signup',methods=['GET','POST'])
 def signup():
+    flag=False
     if request.method=="POST":
         username=request.form.get('username')
         password=request.form.get('password')
         emailid=request.form.get('emailid')
-        new_user=table.users(username=username,email=emailid,password=password)
-        db.session.add(new_user)
-        db.session.commit()  
-        abc = table.users.query.all()
-        for i in abc:
-            print(i.username)
-        return render_template('login.html') 
+        
+        for us in users.query.all():
+            if us.username==username or us.email==emailid:
+                flag=True
+        if not flag:
+            new_user=users(username=username,email=emailid,password=password)
+            db.session.add(new_user)
+            db.session.commit()  
+            return render_template('login.html')
+        else:
+            flash("Username/Emaild ID already exists!")
+            return redirect(url_for('signup'))
+            
     return render_template('index.html')
 
 @app.route('/',methods=['post','get'])
@@ -78,7 +85,6 @@ def imageProcess(id):
             as_attachment=False,    # Don't trigger download
         )
     return "Image not found", 404
-
 
 @login_manager.user_loader
 def loader_user(user_id):
@@ -129,12 +135,15 @@ def likePost(id):
             db.session.add(add_likes)
             main_post.likes+=1
             db.session.commit()
-            
-
-
-    
+        
     return redirect(url_for('getReceipe',id=id))
     
+@app.route("/showdata")
+@login_required
+def showData():
+    data=post_receipe.query.filter_by(user_id=current_user.id)
+    return render_template('showData.html',data=data)
+
 
 with app.app_context():
     db.create_all()
