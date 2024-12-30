@@ -1,0 +1,161 @@
+{% extends 'layout.html' %}
+
+{% block title %}
+  Find Meals For Your Ingredients
+{% endblock %}
+
+{% block style %}
+<style>
+  /* Global Styles */
+  * {
+    box-sizing: border-box;
+  }
+  body {
+  font-family: 'Arial', sans-serif;
+  margin: 0;
+  padding: 0;
+  background: url('/static/images/1.jpg') no-repeat center center fixed;
+  background-size: cover;
+  height: 100vh; /* Ensure the body height covers the full screen */
+  overflow: hidden; /* Disable scrolling */
+  color: #333;
+}
+
+
+  .navbar {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    padding: 15px 30px;
+    background-color: #01080f;
+    position: fixed;
+    width: 100%;
+    top: 0;
+    left: 0;
+    z-index: 100;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  }
+
+  .navbar a {
+    color: #ecf0f1;
+    text-decoration: none;
+    font-size: 1.1em;
+    font-weight: 600;
+    padding: 12px 20px;
+    border-radius: 30px;
+    transition: all 0.3s ease;
+    margin: 0 10px;
+  }
+
+  .navbar a:hover {
+    background-color: #f39c12;
+    color: white;
+  }
+
+  .navbar .logout-link {
+    margin-left: auto;
+  }
+
+  /* Main Container */
+  .container {
+    margin-top: 100px;
+    padding: 20px;
+  }
+
+  /* Recipe Form */
+  .post-form {
+    background-color: rgba(255, 255, 255, 0.8);
+    border-radius: 20px;
+    padding: 40px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    text-align: left;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  .post-form h2 {
+    text-align: center;
+    color: #f39c12;
+    margin-bottom: 25px;
+    font-weight: 600;
+    font-size: 2em;
+  }
+
+  .form-group {
+    margin-bottom: 25px;
+  }
+
+  .form-group label {
+    font-weight: bold;
+    display: block;
+    margin-bottom: 10px;
+    color: #555;
+    font-size: 1.1em;
+  }
+
+  .form-group input,
+  .form-group textarea {
+    width: 100%;
+    padding: 15px;
+    border: 2px solid #ddd;
+    border-radius: 12px;
+    box-sizing: border-box;
+    transition: border-color 0.3s ease;
+  }
+
+  .form-group input:focus,
+  .form-group textarea:focus {
+    border-color: #f39c12;
+  }
+
+  .form-group button {
+    background-color: #f39c12;
+    color: white;
+    border: none;
+    padding: 15px 20px;
+    border-radius: 30px;
+    cursor: pointer;
+    font-size: 16px;
+    width: 100%;
+    transition: all 0.3s ease;
+  }
+
+  .form-group button:hover {
+    background-color: #e67e22;
+  }
+
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="navbar">
+  <div class="left-links">
+    <a href="{{ url_for('addPost') }}" class="{% if request.endpoint == 'addPost' %}active{% endif %}">Home</a>
+    <a href="{{ url_for('showData') }}" class="{% if request.endpoint == 'showData' %}active{% endif %}">MyPost</a>
+  </div>
+  <a href="{{ url_for('logout') }}" class="logout-link {% if request.endpoint == 'logout' %}active{% endif %}">Logout</a>
+</div>
+
+<div class="container">
+  <div class="post-form">
+    <h2>Edit Post</h2>
+    <form method="POST" action="{{ url_for('editPost', id=id) }}" enctype="multipart/form-data">
+      {{ form.hidden_tag() }}
+      <div class="form-group">
+        <label for="PT">{{ form.PT1.label }}</label>
+        {{ form.PT1(value=data.post_title) }}
+      </div>
+
+      <div class="form-group">
+        <label for="PD">{{ form.PD1.label }}</label>
+        {{ form.PD1(value=data.post_description) }}
+      </div>
+
+      <div class="form-group">
+        <button type="submit">{{ form.submit.label.text }}</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+{% endblock %}

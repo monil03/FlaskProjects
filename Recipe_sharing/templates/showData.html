@@ -1,0 +1,169 @@
+{% extends 'layout.html' %}
+{% block title %}
+Find Meals For Your Ingredients
+{% endblock %}
+{% block style %}
+<style>
+  /* Global Styles */
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+  font-family: 'Arial', sans-serif;
+  margin: 0;
+  padding: 0;
+  background: url('/static/images/1.jpg') no-repeat center center fixed;
+  background-size: cover;
+  height: 100vh; /* Ensure the body height covers the full screen */
+  overflow: hidden; /* Disable scrolling */
+  color: #333;
+}
+
+  /* Navigation Bar */
+  .navbar {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    padding: 15px 30px;
+    background-color: #01080f;
+    position: fixed;
+    width: 100%;
+    top: 0;
+    left: 0;
+    z-index: 100;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  }
+
+  .navbar a {
+    color: #ecf0f1;
+    text-decoration: none;
+    font-size: 1.2em;
+    font-weight: 600;
+    padding: 12px 20px;
+    border-radius: 30px;
+    transition: all 0.3s ease;
+    margin: 0 15px;
+  }
+
+  .navbar a:hover {
+    background-color: #f39c12;
+    color: white;
+  }
+
+  .navbar a.active {
+    background-color: #f39c12;
+    color: white;
+  }
+
+  .navbar .left-links {
+    display: flex;
+    gap: 15px;
+  }
+
+  .navbar .logout-link {
+    margin-left: auto;
+  }
+
+  /* Main Container (below navbar) */
+  .container {
+    margin-top: 100px;
+    padding: 20px;
+  }
+
+  /* Recipe Cards Container */
+  .posts-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    padding: 20px;
+    margin-top: 60px;
+    margin-bottom: 60px;
+  }
+
+  .post-card {
+    background-color: #fff;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    overflow: hidden;
+    text-align: center;
+    font-family: 'Arial', sans-serif;
+    padding: 20px;
+    max-width: 300px;
+  }
+
+  .post-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+  }
+
+  .post-image img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 12px;
+  }
+
+  .post-title {
+    font-size: 1.4em;
+    color: #333;
+    margin-top: 20px;
+    font-weight: 600;
+    text-transform: capitalize;
+  }
+
+  .post-description {
+    font-size: 1em;
+    color: #555;
+    margin: 10px 0 20px;
+    line-height: 1.5;
+  }
+
+  .get-recipe-button, .post-button {
+    background-color: #f39c12;
+    color: white;
+    text-align: center;
+    display: block;
+    margin: 15px auto;
+    padding: 12px 0;
+    width: 80%;
+    border-radius: 30px;
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.3s ease;
+  }
+
+  .get-recipe-button:hover, .post-button:hover {
+    background-color: #e67e22;
+  }
+
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Navigation Bar -->
+<div class="navbar">
+  <div class="left-links">
+    <a href="{{ url_for('addPost') }}" class="{% if request.endpoint == 'addPost' %}active{% endif %}">Home</a>
+    <a href="{{ url_for('showData') }}" class="{% if request.endpoint == 'showData' %}active{% endif %}">MyPost</a>
+  </div>
+  <a href="{{ url_for('logout') }}" class="logout-link {% if request.endpoint == 'logout' %}active{% endif %}">Logout</a>
+</div>
+<!-- Recipe Cards -->
+<div class="posts-container">
+  {% for i in data %}
+  <div class="post-card">
+    <div class="post-image">
+      <img src="{{ url_for('imageProcess', id=i.id) }}" alt="Recipe Image" />
+    </div>
+    <h3 class="post-title">{{ i.post_title }}</h3>
+    <p class="post-description">{{ i.post_description }}</p>
+    <a href="{{url_for('editPost', id=i.id)}}" class="post-button">Edit Post</a>
+    <a href="{{url_for('deletePost', id=i.id)}}" class="post-button">Delete Post</a>
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}

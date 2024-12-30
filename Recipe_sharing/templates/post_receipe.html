@@ -1,0 +1,345 @@
+{% extends 'layout.html' %}
+
+{% block title %}
+  Find Meals For Your Ingredients
+{% endblock %}
+
+{% block style %}
+<style>
+  /* Global Styles */
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    padding: 0;
+    background: url('/static/images/1.jpg') no-repeat center center fixed;
+    background-size: cover;
+    color: #333;
+    overflow-x: hidden;
+  }
+
+  /* Navigation Bar */
+  .navbar {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    padding: 15px 30px;
+    background-color: #01080f;
+    position: fixed;
+    width: 100%;
+    top: 0;
+    left: 0;
+    z-index: 100;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  }
+
+  .navbar a {
+    color: #ecf0f1;
+    text-decoration: none;
+    font-size: 1.1em;
+    font-weight: 600;
+    padding: 12px 20px;
+    border-radius: 30px;
+    transition: all 0.3s ease;
+    margin: 0 10px;
+  }
+
+  .navbar a:hover {
+    background-color: #f39c12;
+    color: white;
+  }
+
+  .navbar a.active {
+    background-color: #f39c12;
+    color: white;
+  }
+
+  .navbar .left-links {
+    display: flex;
+    gap: 10px;
+  }
+
+  .navbar .logout-link {
+    margin-left: auto;
+  }
+
+  /* Main Container */
+  .container {
+    margin-top: 100px;
+    padding: 20px;
+  }
+
+  /* Search Section */
+  .search-section {
+    text-align: center;
+    background-color: rgba(255, 255, 255, 0.8);
+    border-radius: 15px;
+    padding: 40px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    margin-bottom: 60px;
+  }
+  .search-box input[type="text"] {
+  width: 50%;  /* Reduced width */
+  padding: 12px;  /* Reduced padding */
+  border: 2px solid #ddd;
+  border-radius: 30px;
+  font-size: 16px;
+  outline: none;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.search-box button {
+  padding: 12px 20px;  /* Adjusted button padding */
+  background-color: #f39c12;
+  color: white;
+  border: none;
+  border-radius: 30px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: all 0.3s ease;
+}
+
+
+  .search-section h1 {
+    font-size: 3.5em;
+    color: #333;
+    margin-bottom: 20px;
+    font-weight: 600;
+  }
+
+  .search-section p {
+    font-size: 1.2em;
+    color: #777;
+    margin-bottom: 40px;
+    font-style: italic;
+    line-height: 1.6;
+  }
+
+  .search-box {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 60px;
+  }
+
+  .search-box input[type="text"] {
+    width: 60%;
+    padding: 15px;
+    border: 2px solid #ddd;
+    border-radius: 30px;
+    font-size: 16px;
+    outline: none;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  .search-box button {
+    padding: 15px 25px;
+    background-color: #f39c12;
+    color: white;
+    border: none;
+    border-radius: 30px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: all 0.3s ease;
+  }
+
+  .search-box button:hover {
+    background-color: #e67e22;
+  }
+
+  /* Recipe Cards */
+  .posts-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+    padding: 20px;
+    margin-top: 60px;
+    margin-bottom: 60px;
+  }
+
+  .post-card {
+    background-color: #fff;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    width: 320px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    overflow: hidden;
+    text-align: center;
+    padding: 20px;
+  }
+
+  .post-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+  }
+
+  .post-image img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 15px;
+  }
+
+  .post-title {
+    font-size: 1.4em;
+    color: #333;
+    margin-top: 20px;
+    font-weight: 600;
+    text-transform: capitalize;
+  }
+
+  .post-description {
+    font-size: 1em;
+    color: #555;
+    margin: 10px 0 20px;
+    line-height: 1.5;
+  }
+
+  .get-recipe-button {
+    background-color: #f39c12;
+    color: white;
+    text-align: center;
+    display: block;
+    margin: 15px auto;
+    padding: 12px 0;
+    width: 80%;
+    border-radius: 30px;
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.3s ease;
+  }
+
+  .get-recipe-button:hover {
+    background-color: #e67e22;
+  }
+
+  /* Form Styles for Add Recipe */
+  .post-form {
+    background-color: rgba(255, 255, 255, 0.8); /* Slight transparency */
+    border-radius: 15px;
+    padding: 30px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    margin-bottom: 60px;
+  }
+
+  .post-form h2 {
+    font-size: 2.5em;
+    color: #333;
+    margin-bottom: 20px;
+    font-weight: 600;
+    font-family: 'Roboto', sans-serif; /* Changed font for form header */
+  }
+
+  .post-form .form-group {
+    margin-bottom: 20px;
+  }
+
+  .post-form label {
+    font-size: 1.2em;
+    color: #333;
+    display: block;
+    margin-bottom: 10px;
+    font-family: 'Roboto', sans-serif; /* Changed font for form labels */
+  }
+
+  .post-form input[type="text"],
+  .post-form textarea,
+  .post-form input[type="file"] {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 30px;
+    font-size: 1.1em;
+    margin-bottom: 20px;
+    box-sizing: border-box;
+    font-family: 'Roboto', sans-serif; /* Changed font for form inputs */
+  }
+
+  .post-form button[type="submit"] {
+    padding: 15px 25px;
+    background-color: #f39c12;
+    color: white;
+    border: none;
+    border-radius: 30px;
+    cursor: pointer;
+    font-size: 1.1em;
+    width: 100%;
+    transition: background-color 0.3s ease;
+    font-family: 'Roboto', sans-serif; /* Changed font for form button */
+  }
+
+  .post-form button[type="submit"]:hover {
+    background-color: #e67e22;
+  }
+</style>
+{% endblock %}
+
+
+{% block content %}
+<div class="navbar">
+  <div class="left-links">
+    <a href="{{ url_for('addPost') }}" class="{% if request.endpoint == 'addPost' %}active{% endif %}">Home</a>
+    <a href="{{ url_for('showData') }}" class="{% if request.endpoint == 'showData' %}active{% endif %}">MyPost</a>
+  </div>
+  <a href="{{ url_for('logout') }}" class="logout-link {% if request.endpoint == 'logout' %}active{% endif %}">Logout</a>
+</div>
+
+<div class="container">
+  <div class="search-section">
+    <h1>Find Meals For Your Ingredients</h1>
+    <p>Real food doesn't have ingredients, real food *is* ingredients. <br /><em>- Jamie Oliver</em></p>
+    <div class="search-box">
+      <form action="{{url_for('search')}}" method="POST">
+        <input type="text" name="ingredient" placeholder="Search for an ingredient..." />
+        <button type="submit" class="search-button">Search</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Add Recipe Form -->
+  <div class="post-form">
+    <h2>Share Your Recipe</h2>
+    <form method="POST" action="/add_post" enctype="multipart/form-data">
+      {{ form.hidden_tag() }}
+      <div class="form-group">
+        <label for="PT">{{ form.PT.label }}</label>
+        {{ form.PT }}
+      </div>
+
+      <div class="form-group">
+        <label for="PD">{{ form.PD.label }}</label>
+        {{ form.PD }}
+      </div>
+
+      <div class="form-group">
+        <label for="image">{{ form.image.label }}</label>
+        {{ form.image }}
+      </div>
+
+      <div class="form-group">
+        <button type="submit">{{ form.submit.label.text }}</button>
+      </div>
+    </form>
+  </div>
+
+  <div class="posts-container">
+    {% for i in data %}
+    <div class="post-card">
+      <div class="post-image">
+        <img src="{{ url_for('imageProcess', id=i.id) }}" alt="Recipe Image" />
+      </div>
+      <h3 class="post-title">{{ i.post_title }}</h3>
+      <p class="post-description">{{ i.post_description }}</p>
+      <a href="{{ url_for('getReceipe', id=i.id) }}" class="get-recipe-button">Get Recipe</a>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}
