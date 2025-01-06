@@ -8,6 +8,16 @@ app=Flask(__name__)
 app.config['SECRET_KEY']="abc"
 socketio=SocketIO(app,cors_allowed_origins="*")
 
+@app.route("/createRoom")
+def createRoom():
+    session.clear()
+    code = ''
+    for i in range(0,4):
+        code += random.choice(ascii_uppercase)
+    codes.append(code)  
+    session['code'] = code  
+    return redirect(url_for('index'))
+
 
 @socketio.on("connect")
 def connect():
