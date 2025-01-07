@@ -19,6 +19,23 @@ def createRoom():
     return redirect(url_for('index'))
 
 
+@socketio.on("join")
+def handle_join(data):
+    global members
+    uname = data['username']
+    code = data['code']
+    for room in room_details:
+        if room['code'] == code:
+            join_room(code)
+            update_room(code)
+            print(room_details)
+            session['code']=code
+            session['uname']=uname
+            emit('message', {'msg': uname + ' has entered the room.'}, room=code)
+        else:
+            emit('message', {'msg': 'Invalid room code.'})
+            
+
 @socketio.on("connect")
 def connect():
     print("connected")
