@@ -5,7 +5,7 @@ from string import ascii_uppercase
 
 
 app=Flask(__name__)
-app.config['SECRET_KEY']="abc"
+app.config['SECRET_KEY']="abcde"
 socketio=SocketIO(app,cors_allowed_origins="*")
 codes=[]
 room_details = []
